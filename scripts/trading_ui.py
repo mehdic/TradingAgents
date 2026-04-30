@@ -742,6 +742,8 @@ def run_job(job_id: str, params: dict[str, str]) -> None:
     ]
     env = os.environ.copy()
     env.setdefault("OPENAI_API_KEY", "codex-proxy-noop")
+    existing_pythonpath = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = str(ROOT) if not existing_pythonpath else f"{ROOT}{os.pathsep}{existing_pythonpath}"
     timeout = int(params.get("timeout", "1800"))
     proxy_metrics_before = fetch_proxy_metrics()
     started = time.time()
