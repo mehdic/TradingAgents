@@ -33,6 +33,8 @@ JOBS_LOCK = threading.Lock()
 TICKER_RE = re.compile(r"^[A-Za-z0-9.\-]{1,12}$")
 ANALYSTS = ["market", "social", "news", "fundamentals"]
 MODELS = ["gpt-5.4-mini", "gpt-5.5", "gpt-5.4", "gpt-5.2"]
+PORTFOLIO_PATH = Path("/Users/mehdichaouachi/.openclaw/workspace/memory/mehdi-portfolio.md")
+DEFAULT_PORTFOLIO_TICKERS = ["NVDA", "AMZN", "AAPL", "MSFT", "GOOGL", "VUSA", "META", "STLA"]
 
 STYLE = """
 :root{color-scheme:dark;--bg:#090b10;--card:#111722;--muted:#91a0b7;--text:#edf2ff;--gold:#d9a441;--bad:#ff6b6b;--ok:#46d17d;--line:#243044}*{box-sizing:border-box}body{margin:0;font:16px/1.45 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;background:radial-gradient(circle at 20% 0%,#172137 0,#090b10 36rem);color:var(--text)}main{max-width:1200px;margin:0 auto;padding:42px 20px 80px}.hero{display:flex;gap:18px;align-items:center;margin-bottom:28px}.sigil{width:54px;height:54px;border:1px solid #6d4d16;border-radius:16px;background:linear-gradient(135deg,#2b1d08,#d9a441);display:grid;place-items:center;font-size:28px;box-shadow:0 0 60px rgba(217,164,65,.2)}h1{margin:0;font-size:clamp(30px,5vw,54px);letter-spacing:-.04em}h2,h3{margin-top:0}.sub{color:var(--muted);margin:.25rem 0 0}.grid{display:grid;grid-template-columns:380px 1fr;gap:20px}.detailgrid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px}@media(max-width:900px){.grid,.detailgrid{grid-template-columns:1fr}}.card{background:rgba(17,23,34,.88);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 20px 70px rgba(0,0,0,.26);margin-bottom:20px}label{display:block;color:#c8d2e3;font-weight:700;margin:14px 0 6px}input,select{width:100%;border:1px solid #334158;border-radius:12px;background:#0a0f17;color:var(--text);padding:12px 13px;font:inherit}.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}.check{border:1px solid #334158;border-radius:12px;padding:10px;background:#0a0f17}.check input{width:auto;margin-right:7px}button,.btn{display:inline-block;text-align:center;text-decoration:none;margin-top:12px;border:0;border-radius:14px;background:linear-gradient(135deg,#d9a441,#ffdc7d);color:#130d02;font-weight:900;padding:12px 14px;font:inherit;cursor:pointer}.btn.secondary{background:#0a0f17;color:#ffd47a;border:1px solid #334158}.btnrow{display:flex;gap:10px;flex-wrap:wrap}.runbtn{width:100%}button:disabled{filter:grayscale(1);opacity:.55;cursor:not-allowed}.muted{color:var(--muted);font-size:14px}.status{display:inline-flex;align-items:center;gap:8px;border:1px solid #334158;background:#0a0f17;border-radius:999px;padding:7px 11px;color:var(--muted);font-size:14px}.dot{width:9px;height:9px;border-radius:99px;background:var(--muted)}.running .dot{background:var(--gold);box-shadow:0 0 18px var(--gold)}.done .dot{background:var(--ok)}.failed .dot{background:var(--bad)}pre{white-space:pre-wrap;word-break:break-word;background:#05070b;border:1px solid #1b2638;border-radius:16px;padding:16px;max-height:680px;overflow:auto}.result{min-height:260px}.decision{border-left:4px solid var(--gold);padding-left:14px;margin:18px 0}.decision-hero{display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:stretch;border-width:2px;position:relative;overflow:hidden}.decision-hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 0% 0%,var(--decision-glow),transparent 30rem);pointer-events:none}.decision-hero>*{position:relative}.verdict-box{border:1px solid var(--decision-border);background:var(--decision-bg);border-radius:18px;padding:18px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;min-height:150px}.verdict-label{font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.14em}.verdict{font-size:clamp(34px,5vw,58px);font-weight:1000;letter-spacing:-.05em;line-height:.95;color:var(--decision-color);text-transform:uppercase;text-shadow:0 0 24px var(--decision-glow)}.verdict-ticker{font-size:18px;font-weight:900;color:#fff;margin-top:10px}.decision-summary{font-size:18px;color:#e8eefb}.decision-summary strong{color:#fff}.decision-actions{margin-top:10px;color:var(--muted)}.tone-buy{--decision-color:#46d17d;--decision-border:#276f43;--decision-bg:rgba(70,209,125,.10);--decision-glow:rgba(70,209,125,.24)}.tone-hold{--decision-color:#ffd47a;--decision-border:#8a6521;--decision-bg:rgba(217,164,65,.12);--decision-glow:rgba(217,164,65,.24)}.tone-sell{--decision-color:#ff6b6b;--decision-border:#8a3030;--decision-bg:rgba(255,107,107,.12);--decision-glow:rgba(255,107,107,.24)}.tone-neutral{--decision-color:#91a0b7;--decision-border:#334158;--decision-bg:rgba(145,160,183,.10);--decision-glow:rgba(145,160,183,.18)}.mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.mini-card{border:1px solid #334158;background:#0a0f17;border-radius:14px;padding:12px}.mini-label{font-size:11px;color:#91a0b7;text-transform:uppercase;letter-spacing:.10em;font-weight:900}.mini-value{font-size:18px;font-weight:900;color:#fff;margin-top:4px}.resource-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.resource-pill{border:1px solid #334158;background:#05070b;border-radius:999px;padding:6px 10px;font-size:13px;color:#c8d2e3}.resource-pill.on{border-color:#d9a441;color:#ffd47a;background:#2b1d08}.resource-pill.present{border-color:#46d17d;color:#8dffb7;background:rgba(70,209,125,.08)}.chart-controls{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}.chart-range{border:1px solid #334158;background:#0a0f17;color:#ffd47a;border-radius:999px;padding:7px 11px;cursor:pointer}.chart-range.active{background:#2b1d08;border-color:#d9a441}.chart-wrap{background:#05070b;border:1px solid #1b2638;border-radius:16px;padding:12px;overflow:hidden}.chart-svg{width:100%;height:auto;display:block}.chart-summary{border-left:4px solid var(--decision-color,#d9a441);padding-left:12px;color:#e8eefb;margin:12px 0}.legend{display:flex;gap:10px;flex-wrap:wrap;color:#91a0b7;font-size:12px}.legend span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;background:var(--c)}@media(max-width:700px){.decision-hero{grid-template-columns:1fr}.verdict-box{min-height:auto}}.tiny{font-size:12px;color:#738198}a{color:#ffd47a}.table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid #243044;padding:10px;text-align:left;vertical-align:top}.pill{display:inline-block;border:1px solid #334158;border-radius:999px;padding:3px 8px;font-size:12px;color:#c8d2e3;background:#0a0f17}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tab{border:1px solid #334158;background:#0a0f17;color:#ffd47a;border-radius:999px;padding:8px 11px;cursor:pointer}.tab.active{background:#2b1d08;border-color:#d9a441}.section{display:none}.section.active{display:block}.report{white-space:pre-wrap;background:#05070b;border:1px solid #1b2638;border-radius:16px;padding:16px;max-height:780px;overflow:auto}.danger{color:#ff9b9b}.ok{color:#8dffb7}
@@ -45,6 +47,45 @@ def now_iso() -> str:
 
 def html_escape(value: object) -> str:
     return str(value).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+
+def parse_holdings_tickers(markdown: str) -> list[str]:
+    in_holdings = False
+    ticker_col: int | None = None
+    tickers: list[str] = []
+    seen: set[str] = set()
+    for line in markdown.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("## "):
+            in_holdings = stripped.lower() == "## holdings"
+            ticker_col = None
+            continue
+        if not in_holdings or not stripped.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if ticker_col is None:
+            headers = [cell.lower() for cell in cells]
+            if "ticker" not in headers:
+                continue
+            ticker_col = headers.index("ticker")
+            continue
+        if all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells):
+            continue
+        if ticker_col >= len(cells):
+            continue
+        ticker = cells[ticker_col].upper()
+        if TICKER_RE.match(ticker) and ticker not in seen:
+            seen.add(ticker)
+            tickers.append(ticker)
+    return tickers
+
+
+def portfolio_tickers(path: Path = PORTFOLIO_PATH) -> list[str]:
+    try:
+        tickers = parse_holdings_tickers(path.read_text(encoding="utf-8"))
+    except Exception:
+        return DEFAULT_PORTFOLIO_TICKERS.copy()
+    return tickers or DEFAULT_PORTFOLIO_TICKERS.copy()
 
 
 def safe_run_id(run_id: str) -> str:
@@ -497,7 +538,8 @@ def page() -> bytes:
         for a in ANALYSTS
     )
     models = "".join(f'<option value="{m}">{m}</option>' for m in MODELS)
-    body = f"""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TradingAgents — Reaper</title><style>{STYLE}</style></head><body><main><section class="hero"><div class="sigil">⚔️</div><div><h1>TradingAgents</h1><p class="sub">Codex-powered market research archive. No broker. No real-money execution.</p></div></section><section class="grid"><form id="runForm" class="card"><h2>Run analysis</h2><label>Ticker</label><input name="ticker" value="AAPL" maxlength="12" autocomplete="off" required><label>Analysis date</label><input name="date" type="date" value="{today}" required><label>Analysts</label><div class="checks">{checks}</div><label>Model</label><select name="model">{models}</select><label>Timeout</label><select name="timeout"><option value="900">15 minutes</option><option value="1800" selected>30 minutes</option><option value="3600">60 minutes</option></select><button class="runbtn" id="runBtn" type="submit">Run analysis</button><p class="muted">Every run is saved under <code>~/.tradingagents/ui_runs</code>. Full state logs remain under <code>~/.tradingagents/logs</code>.</p></form><section class="card result"><div id="status" class="status"><span class="dot"></span><span>Idle</span></div><div id="decision" class="decision" style="display:none"></div><pre id="output">Ready.</pre><p class="tiny">Public path: OVH DNS → AWS nginx → reverse SSH tunnel → Mac UI.</p></section></section><section class="card"><h2>Run history</h2><p class="muted">Includes UI runs plus imported TradingAgents full-state logs.</p><div id="history">Loading…</div></section></main><script>
+    ticker_options = "".join(f'<option value="{html_escape(ticker)}"></option>' for ticker in portfolio_tickers())
+    body = f"""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TradingAgents — Reaper</title><style>{STYLE}</style></head><body><main><section class="hero"><div class="sigil">⚔️</div><div><h1>TradingAgents</h1><p class="sub">Codex-powered market research archive. No broker. No real-money execution.</p></div></section><section class="grid"><form id="runForm" class="card"><h2>Run analysis</h2><label>Ticker</label><input name="ticker" value="AAPL" maxlength="12" autocomplete="off" list="portfolioTickers" required><datalist id="portfolioTickers">{ticker_options}</datalist><label>Analysis date</label><input name="date" type="date" value="{today}" required><label>Analysts</label><div class="checks">{checks}</div><label>Model</label><select name="model">{models}</select><label>Timeout</label><select name="timeout"><option value="900">15 minutes</option><option value="1800" selected>30 minutes</option><option value="3600">60 minutes</option></select><button class="runbtn" id="runBtn" type="submit">Run analysis</button><p class="muted">Every run is saved under <code>~/.tradingagents/ui_runs</code>. Full state logs remain under <code>~/.tradingagents/logs</code>.</p></form><section class="card result"><div id="status" class="status"><span class="dot"></span><span>Idle</span></div><div id="decision" class="decision" style="display:none"></div><pre id="output">Ready.</pre><p class="tiny">Public path: OVH DNS → AWS nginx → reverse SSH tunnel → Mac UI.</p></section></section><section class="card"><h2>Run history</h2><p class="muted">Includes UI runs plus imported TradingAgents full-state logs.</p><div id="history">Loading…</div></section></main><script>
 const form=document.getElementById('runForm'), btn=document.getElementById('runBtn'), out=document.getElementById('output'), statusBox=document.getElementById('status'), decision=document.getElementById('decision'), historyBox=document.getElementById('history');
 function setStatus(s, text){{statusBox.className='status '+s; statusBox.querySelector('span:last-child').textContent=text;}}
 function escapeHtml(s){{return String(s||'').replace(/[&<>\"]/g,c=>({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}}[c]));}}
