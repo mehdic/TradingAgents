@@ -39,6 +39,8 @@ DEFAULT_PORTFOLIO_TICKERS = ["NVDA", "AMZN", "AAPL", "MSFT", "GOOGL", "VUSA", "M
 
 STYLE = """
 :root{color-scheme:dark;--bg:#090b10;--card:#111722;--muted:#91a0b7;--text:#edf2ff;--gold:#d9a441;--bad:#ff6b6b;--ok:#46d17d;--line:#243044}*{box-sizing:border-box}body{margin:0;font:16px/1.45 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto;background:radial-gradient(circle at 20% 0%,#172137 0,#090b10 36rem);color:var(--text)}main{max-width:1200px;margin:0 auto;padding:42px 20px 80px}.hero{display:flex;gap:18px;align-items:center;margin-bottom:28px}.sigil{width:54px;height:54px;border:1px solid #6d4d16;border-radius:16px;background:linear-gradient(135deg,#2b1d08,#d9a441);display:grid;place-items:center;font-size:28px;box-shadow:0 0 60px rgba(217,164,65,.2)}h1{margin:0;font-size:clamp(30px,5vw,54px);letter-spacing:-.04em}h2,h3{margin-top:0}.sub{color:var(--muted);margin:.25rem 0 0}.grid{display:grid;grid-template-columns:380px 1fr;gap:20px}.detailgrid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px}@media(max-width:900px){main{padding:24px 12px 56px}.grid,.detailgrid{grid-template-columns:1fr}.card{padding:16px;border-radius:18px}.hero{align-items:flex-start}.sigil{width:44px;height:44px;border-radius:14px;font-size:23px}.checks{grid-template-columns:1fr}.table{display:block;overflow-x:auto;white-space:nowrap}.btnrow{display:grid;grid-template-columns:1fr}.btn,.runbtn,button{width:100%;min-height:46px}pre,.report{max-height:58vh}.mini-grid{grid-template-columns:1fr}.chart-wrap{padding:8px}.chart-controls{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.chart-range{padding:9px 6px;text-align:center}}.card{background:rgba(17,23,34,.88);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 20px 70px rgba(0,0,0,.26);margin-bottom:20px}label{display:block;color:#c8d2e3;font-weight:700;margin:14px 0 6px}input,select{width:100%;border:1px solid #334158;border-radius:12px;background:#0a0f17;color:var(--text);padding:12px 13px;font:inherit;min-height:46px}select{appearance:auto}.customTicker{display:none;margin-top:8px}.customTicker.show{display:block}.formhint{margin:6px 0 0;color:#91a0b7;font-size:12px}.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}.check{border:1px solid #334158;border-radius:12px;padding:10px;background:#0a0f17}.check input{width:auto;margin-right:7px}button,.btn{display:inline-block;text-align:center;text-decoration:none;margin-top:12px;border:0;border-radius:14px;background:linear-gradient(135deg,#d9a441,#ffdc7d);color:#130d02;font-weight:900;padding:12px 14px;font:inherit;cursor:pointer}.btn.secondary{background:#0a0f17;color:#ffd47a;border:1px solid #334158}.btnrow{display:flex;gap:10px;flex-wrap:wrap}.runbtn{width:100%}button:disabled{filter:grayscale(1);opacity:.55;cursor:not-allowed}.muted{color:var(--muted);font-size:14px}.status{display:inline-flex;align-items:center;gap:8px;border:1px solid #334158;background:#0a0f17;border-radius:999px;padding:7px 11px;color:var(--muted);font-size:14px}.dot{width:9px;height:9px;border-radius:99px;background:var(--muted)}.running .dot{background:var(--gold);box-shadow:0 0 18px var(--gold)}.done .dot{background:var(--ok)}.failed .dot{background:var(--bad)}pre{white-space:pre-wrap;word-break:break-word;background:#05070b;border:1px solid #1b2638;border-radius:16px;padding:16px;max-height:680px;overflow:auto}.result{min-height:260px}.decision{border-left:4px solid var(--gold);padding-left:14px;margin:18px 0}.decision-hero{display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:stretch;border-width:2px;position:relative;overflow:hidden}.decision-hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 0% 0%,var(--decision-glow),transparent 30rem);pointer-events:none}.decision-hero>*{position:relative}.verdict-box{border:1px solid var(--decision-border);background:var(--decision-bg);border-radius:18px;padding:18px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;min-height:150px}.verdict-label{font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.14em}.verdict{font-size:clamp(34px,5vw,58px);font-weight:1000;letter-spacing:-.05em;line-height:.95;color:var(--decision-color);text-transform:uppercase;text-shadow:0 0 24px var(--decision-glow)}.verdict-ticker{font-size:18px;font-weight:900;color:#fff;margin-top:10px}.decision-summary{font-size:18px;color:#e8eefb}.decision-summary strong{color:#fff}.decision-actions{margin-top:10px;color:var(--muted)}.tone-buy{--decision-color:#46d17d;--decision-border:#276f43;--decision-bg:rgba(70,209,125,.10);--decision-glow:rgba(70,209,125,.24)}.tone-hold{--decision-color:#ffd47a;--decision-border:#8a6521;--decision-bg:rgba(217,164,65,.12);--decision-glow:rgba(217,164,65,.24)}.tone-sell{--decision-color:#ff6b6b;--decision-border:#8a3030;--decision-bg:rgba(255,107,107,.12);--decision-glow:rgba(255,107,107,.24)}.tone-neutral{--decision-color:#91a0b7;--decision-border:#334158;--decision-bg:rgba(145,160,183,.10);--decision-glow:rgba(145,160,183,.18)}.mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.mini-card{border:1px solid #334158;background:#0a0f17;border-radius:14px;padding:12px}.mini-label{font-size:11px;color:#91a0b7;text-transform:uppercase;letter-spacing:.10em;font-weight:900}.mini-value{font-size:18px;font-weight:900;color:#fff;margin-top:4px}.resource-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.resource-pill{border:1px solid #334158;background:#05070b;border-radius:999px;padding:6px 10px;font-size:13px;color:#c8d2e3}.resource-pill.on{border-color:#d9a441;color:#ffd47a;background:#2b1d08}.resource-pill.present{border-color:#46d17d;color:#8dffb7;background:rgba(70,209,125,.08)}.chart-controls{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}.chart-range{border:1px solid #334158;background:#0a0f17;color:#ffd47a;border-radius:999px;padding:7px 11px;cursor:pointer}.chart-range.active{background:#2b1d08;border-color:#d9a441}.chart-wrap{background:#05070b;border:1px solid #1b2638;border-radius:16px;padding:12px;overflow:hidden}.chart-svg{width:100%;height:auto;display:block}.chart-summary{border-left:4px solid var(--decision-color,#d9a441);padding-left:12px;color:#e8eefb;margin:12px 0}.legend{display:flex;gap:10px;flex-wrap:wrap;color:#91a0b7;font-size:12px}.legend span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;background:var(--c)}@media(max-width:700px){.decision-hero{grid-template-columns:1fr}.verdict-box{min-height:auto}.verdict{font-size:40px}.decision-summary{font-size:16px}.table th,.table td{padding:8px}.resource-list{gap:6px}.resource-pill{font-size:12px}.tabs{display:grid;grid-template-columns:1fr 1fr}.tab{padding:10px 8px}}.tiny{font-size:12px;color:#738198}a{color:#ffd47a}.table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid #243044;padding:10px;text-align:left;vertical-align:top}.pill{display:inline-block;border:1px solid #334158;border-radius:999px;padding:3px 8px;font-size:12px;color:#c8d2e3;background:#0a0f17}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tab{border:1px solid #334158;background:#0a0f17;color:#ffd47a;border-radius:999px;padding:8px 11px;cursor:pointer}.tab.active{background:#2b1d08;border-color:#d9a441}.section{display:none}.section.active{display:block}.report{white-space:pre-wrap;background:#05070b;border:1px solid #1b2638;border-radius:16px;padding:16px;max-height:780px;overflow:auto}.danger{color:#ff9b9b}.ok{color:#8dffb7}
+@media(max-width:760px){body{overflow-x:hidden;font-size:15px}main{width:100%;max-width:100vw;padding:16px 10px 48px}.hero{gap:10px;margin-bottom:16px}.hero h1{font-size:26px;line-height:1.05;word-break:break-word}.sub{word-break:break-word}.detailgrid,.grid{display:block}.detailgrid>section,.detailgrid aside,.card{min-width:0;width:100%}.card{padding:14px;border-radius:16px;margin-bottom:14px}.decision-hero{display:block;padding:14px}.verdict-box{padding:14px;margin-bottom:12px;min-height:auto}.verdict{font-size:38px;line-height:1}.verdict-ticker{font-size:15px;word-break:break-word}.decision-summary{font-size:15px}.btnrow{display:grid!important;grid-template-columns:1fr!important;gap:8px}.btn,.runbtn,button{width:100%;min-height:48px;margin-top:8px}.tabs{display:grid!important;grid-template-columns:1fr!important;gap:7px}.tab{width:100%;padding:11px 8px}.report,pre{font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;padding:12px;max-height:none}.report{max-height:none}.chart-controls{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:7px}.chart-range{padding:10px 6px}.legend{display:grid;grid-template-columns:1fr 1fr;gap:7px}.chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.chart-svg{min-width:640px}.table{display:block;overflow-x:auto;white-space:normal}.table tbody,.table tr,.table th,.table td{display:block;width:100%}.table tr{border-bottom:1px solid #243044;padding:8px 0}.table th,.table td{border-bottom:0;padding:4px 0;word-break:break-word;overflow-wrap:anywhere}.mini-grid{grid-template-columns:1fr!important}.mini-value{font-size:15px;overflow-wrap:anywhere}.decision{padding-left:10px;margin:10px 0}.resource-list{gap:6px}.resource-pill{font-size:12px;max-width:100%;overflow-wrap:anywhere}.chart-summary{font-size:14px}.section{min-width:0}}
+
 """
 
 
@@ -353,27 +355,49 @@ def plain_text(value: object) -> str:
 def decision_snapshot(final_decision: object, ticker: object = "") -> dict[str, str]:
     text = str(final_decision or "").strip()
     compact = plain_text(text)
-    upper = compact.upper()
+    compact_lower = compact.lower()
     verdict = "UNKNOWN"
     tone = "neutral"
-    candidates = [
-        ("STRONG BUY", "BUY", "buy"),
-        ("OVERWEIGHT", "OVERWEIGHT", "buy"),
-        ("BUY", "BUY", "buy"),
-        ("ACCUMULATE", "BUY", "buy"),
-        ("HOLD", "HOLD", "hold"),
-        ("NEUTRAL", "HOLD", "hold"),
-        ("WAIT", "HOLD", "hold"),
-        ("UNDERWEIGHT", "UNDERWEIGHT", "sell"),
-        ("REDUCE", "SELL", "sell"),
-        ("SELL", "SELL", "sell"),
-        ("SHORT", "SELL", "sell"),
+    explicit_patterns = [
+        r"final\s+(?:trading\s+)?(?:recommendation|decision)\s*:?\s*(strong buy|overweight|underweight|buy|hold|neutral|sell)",
+        r"(?:recommendation|decision)\s*:?\s*(strong buy|overweight|underweight|buy|hold|neutral|sell)",
+        r"portfolio\s+stance\s+(?:now\s+)?is\s*(strong buy|overweight|underweight|buy|hold|neutral|sell)",
     ]
-    for token, label, found_tone in candidates:
-        if re.search(rf"\b{re.escape(token)}\b", upper):
-            verdict = label
-            tone = found_tone
+    label_map = {
+        "strong buy": ("BUY", "buy"),
+        "overweight": ("OVERWEIGHT", "buy"),
+        "buy": ("BUY", "buy"),
+        "hold": ("HOLD", "hold"),
+        "neutral": ("HOLD", "hold"),
+        "underweight": ("UNDERWEIGHT", "sell"),
+        "sell": ("SELL", "sell"),
+    }
+    for pattern in explicit_patterns:
+        match = re.search(pattern, compact_lower, flags=re.IGNORECASE)
+        if match:
+            verdict, tone = label_map[match.group(1).lower()]
             break
+    if verdict == "UNKNOWN":
+        candidates = [
+            ("STRONG BUY", "BUY", "buy"),
+            ("OVERWEIGHT", "OVERWEIGHT", "buy"),
+            ("UNDERWEIGHT", "UNDERWEIGHT", "sell"),
+            ("ACCUMULATE", "BUY", "buy"),
+            ("REDUCE", "SELL", "sell"),
+            ("NEUTRAL", "HOLD", "hold"),
+            ("HOLD", "HOLD", "hold"),
+            ("SELL", "SELL", "sell"),
+            ("SHORT", "SELL", "sell"),
+            ("BUY", "BUY", "buy"),
+        ]
+        upper = compact.upper()
+        best: tuple[int, str, str] | None = None
+        for token, label, found_tone in candidates:
+            match = re.search(rf"\b{re.escape(token)}\b", upper)
+            if match and (best is None or match.start() < best[0]):
+                best = (match.start(), label, found_tone)
+        if best:
+            _, verdict, tone = best
 
     lines = [ln.strip(" -*•\t") for ln in text.splitlines() if ln.strip()]
     first_line = plain_text(lines[0]) if lines else ""
