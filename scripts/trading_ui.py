@@ -30,6 +30,7 @@ LOGS_DIR = TA_HOME / "logs"
 RUNS_DIR = TA_HOME / "ui_runs"
 JOBS: dict[str, dict[str, object]] = {}
 JOBS_LOCK = threading.Lock()
+STALE_JOB_SECONDS = 5 * 60
 TICKER_RE = re.compile(r"^[A-Za-z0-9.\-]{1,12}$")
 ANALYSTS = ["market", "social", "news", "fundamentals"]
 MODELS = ["gpt-5.4-mini", "gpt-5.5", "gpt-5.4", "gpt-5.2"]
@@ -162,8 +163,126 @@ def save_meta(run_id: str, updates: dict[str, object]) -> dict[str, object]:
     return data
 
 
+def parse_iso_datetime(value: object) -> datetime | None:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
+def normalized_state_path(value: object) -> str:
+    raw = str(value or "").strip()
+    if not raw:
+        return ""
+    return os.path.normcase(os.path.abspath(os.path.expanduser(raw)))
+
+
+def is_imported_run(meta: dict[str, object]) -> bool:
+    return bool(meta.get("imported")) or str(meta.get("id", "")).startswith("imported-")
+
+
+def run_ticker_date_key(meta: dict[str, object]) -> tuple[str, str]:
+    return (str(meta.get("ticker") or "").upper(), str(meta.get("date") or ""))
+
+
+def read_all_run_metas() -> list[dict[str, object]]:
+    runs: list[dict[str, object]] = []
+    for p in RUNS_DIR.glob("*/meta.json"):
+        data = read_json_file(p)
+        if data:
+            data.setdefault("id", p.parent.name)
+            runs.append(data)
+    return runs
+
+
+def imported_run_has_ui_duplicate(imported: dict[str, object], runs: list[dict[str, object]]) -> bool:
+    import_state_path = normalized_state_path(imported.get("state_path"))
+    import_key = run_ticker_date_key(imported)
+    for run in runs:
+        if is_imported_run(run):
+            continue
+        if import_state_path and normalized_state_path(run.get("state_path")) == import_state_path:
+            return True
+        if import_key[0] and import_key[1] and run_ticker_date_key(run) == import_key:
+            return True
+    return False
+
+
+def stale_run_has_newer_success(run: dict[str, object], runs: list[dict[str, object]]) -> bool:
+    if is_imported_run(run) or str(run.get("status") or "") != "failed":
+        return False
+    if "UI service restarted" not in str(run.get("error") or ""):
+        return False
+    key = run_ticker_date_key(run)
+    if not key[0] or not key[1]:
+        return False
+    created = parse_iso_datetime(run.get("created_at")) or datetime.min.replace(tzinfo=timezone.utc)
+    for other in runs:
+        if other is run or is_imported_run(other):
+            continue
+        if run_ticker_date_key(other) != key or str(other.get("status") or "") != "done":
+            continue
+        other_created = parse_iso_datetime(other.get("created_at")) or datetime.min.replace(tzinfo=timezone.utc)
+        if other_created >= created:
+            return True
+    return False
+
+
+def visible_history_runs(runs: list[dict[str, object]]) -> list[dict[str, object]]:
+    visible: list[dict[str, object]] = []
+    for run in runs:
+        if is_imported_run(run) and imported_run_has_ui_duplicate(run, runs):
+            continue
+        if stale_run_has_newer_success(run, runs):
+            continue
+        visible.append(run)
+    visible.sort(key=lambda r: str(r.get("created_at") or r.get("updated_at") or ""), reverse=True)
+    return visible
+
+
+def run_has_final_artifact(run_id: str, meta: dict[str, object]) -> bool:
+    state_path = normalized_state_path(meta.get("state_path"))
+    return bool(state_path and Path(state_path).exists()) or report_path(run_id).exists()
+
+
+def reconcile_stale_jobs() -> None:
+    now = datetime.now(timezone.utc)
+    for meta in read_all_run_metas():
+        status = str(meta.get("status") or "")
+        if status not in {"queued", "running"}:
+            continue
+        run_id = str(meta.get("id") or "")
+        if not run_id:
+            continue
+        with JOBS_LOCK:
+            in_memory = run_id in JOBS
+        if in_memory:
+            continue
+        started = parse_iso_datetime(meta.get("started_at")) or parse_iso_datetime(meta.get("updated_at")) or parse_iso_datetime(meta.get("created_at"))
+        if not started or (now - started).total_seconds() < STALE_JOB_SECONDS:
+            continue
+        if run_has_final_artifact(run_id, meta):
+            continue
+        error = "UI service restarted while this run was queued/running; no active job, final state, or final report was found."
+        stdout = stdout_path(run_id).read_text(errors="replace") if stdout_path(run_id).exists() else ""
+        if stdout and error not in stdout:
+            stdout += f"\nERROR: {error}\n"
+            stdout_path(run_id).write_text(stdout)
+        elif not stdout:
+            stdout = f"ERROR: {error}\n"
+            stdout_path(run_id).write_text(stdout)
+        updated = save_meta(run_id, {"status": "failed", "finished_at": now_iso(), "error": error, "decision": extract_decision(stdout)})
+        report_path(run_id).write_text(generate_report(updated, load_state(updated), stdout))
+
+
 def discover_state_logs() -> None:
     RUNS_DIR.mkdir(parents=True, exist_ok=True)
+    existing_runs = read_all_run_metas()
     for path in LOGS_DIR.glob("*/TradingAgentsStrategy_logs/full_states_log_*.json"):
         try:
             state = read_json_file(path)
@@ -187,7 +306,10 @@ def discover_state_logs() -> None:
                 "state_path": str(path),
                 "imported": True,
             }
+            if imported_run_has_ui_duplicate(meta, existing_runs):
+                continue
             save_meta(run_id, meta)
+            existing_runs.append(meta)
             report_path(run_id).write_text(generate_report(meta, state))
         except Exception:
             continue
@@ -195,14 +317,8 @@ def discover_state_logs() -> None:
 
 def list_runs() -> list[dict[str, object]]:
     discover_state_logs()
-    runs: list[dict[str, object]] = []
-    for p in RUNS_DIR.glob("*/meta.json"):
-        data = read_json_file(p)
-        if data:
-            data.setdefault("id", p.parent.name)
-            runs.append(data)
-    runs.sort(key=lambda r: str(r.get("created_at") or r.get("updated_at") or ""), reverse=True)
-    return runs
+    reconcile_stale_jobs()
+    return visible_history_runs(read_all_run_metas())
 
 
 def load_state(meta: dict[str, object]) -> dict[str, object]:
@@ -534,7 +650,7 @@ def generate_report(meta: dict[str, object], state: dict[str, object] | None = N
 def page() -> bytes:
     today = date.today().isoformat()
     checks = "".join(
-        f'<label class="check"><input type="checkbox" name="analysts" value="{a}" {"checked" if a == "market" else ""}> {a.title()}</label>'
+        f'<label class="check"><input type="checkbox" name="analysts" value="{a}" checked> {a.title()}</label>'
         for a in ANALYSTS
     )
     models = "".join(f'<option value="{m}">{m}</option>' for m in MODELS)
@@ -767,7 +883,7 @@ class Handler(BaseHTTPRequestHandler):
         params = {k: v[-1].strip() for k, v in data.items()}
         ticker = params.get("ticker", "").upper()
         run_date = params.get("date", "")
-        analysts = [a for a in params.get("analysts", "market").split(",") if a]
+        analysts = [a for a in params.get("analysts", ",".join(ANALYSTS)).split(",") if a]
         model = params.get("model", "gpt-5.4-mini")
         if not TICKER_RE.match(ticker):
             self.json(400, {"error": "Invalid ticker"})
@@ -785,7 +901,7 @@ class Handler(BaseHTTPRequestHandler):
         safe_params = {
             "ticker": ticker,
             "date": run_date,
-            "analysts": ",".join(analysts) or "market",
+            "analysts": ",".join(analysts) or ",".join(ANALYSTS),
             "model": model,
             "timeout": params.get("timeout", "1800"),
         }
@@ -806,6 +922,7 @@ def main() -> int:
     args = parser.parse_args()
     RUNS_DIR.mkdir(parents=True, exist_ok=True)
     discover_state_logs()
+    reconcile_stale_jobs()
     httpd = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"TradingAgents UI listening on http://{args.host}:{args.port}", flush=True)
     httpd.serve_forever()
