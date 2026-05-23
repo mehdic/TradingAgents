@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>fr.chaouachi.tradingagents.ui</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>/Users/chaouachimehdi/.openclaw/workspace-reaper/projects/TradingAgents/scripts/run_trading_ui_foreground.sh</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/chaouachimehdi/.openclaw/workspace-reaper/projects/TradingAgents</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key>
+    <string>/Users/chaouachimehdi</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>TRADING_AGENTS_ROOT</key>
+    <string>/Users/chaouachimehdi/.openclaw/workspace-reaper/projects/TradingAgents</string>
+    <key>TRADING_UI_HOST</key>
+    <string>0.0.0.0</string>
+    <key>TRADING_UI_PORT</key>
+    <string>8505</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/chaouachimehdi/Library/Logs/TradingAgents/ui.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/chaouachimehdi/Library/Logs/TradingAgents/ui.err.log</string>
+</dict>
+</plist>

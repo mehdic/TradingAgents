@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
-export HOME="/Users/mehdichaouachi"
-ROOT="/Users/mehdichaouachi/.openclaw/workspace-reaper/projects/TradingAgents"
+export HOME="${HOME:-$(cd ~ && pwd)}"
+ROOT="${TRADING_AGENTS_ROOT:-$HOME/.openclaw/workspace-reaper/projects/TradingAgents}"
 cd "$ROOT"
 
 PORT="${TRADING_UI_PORT:-8505}"
