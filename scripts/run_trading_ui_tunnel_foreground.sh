@@ -2,7 +2,7 @@
 set -euo pipefail
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 export HOME="/Users/mehdichaouachi"
-AWS_HOST="ubuntu@100.51.236.128"
+AWS_HOST="ubuntu@16.22.21.97"
 SSH_KEY="/Users/mehdichaouachi/.ssh/aws_migration"
 REMOTE_PORT="${TRADING_UI_REMOTE_PORT:-18505}"
 LOCAL_PORT="${TRADING_UI_PORT:-8505}"
